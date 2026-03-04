@@ -1,7 +1,7 @@
 """
-BDD 用例装饰器模块
-提供 bdd_case 装饰器，自动将 .feature 文件的 Feature/Scenario 信息
-注入 Allure 的 suite/title，并绑定 pytest-bdd 的 scenario。
+BDD test case decorator module.
+Provides the bdd_case decorator that parses .feature files, injects
+Feature/Scenario info into Allure suite/title, and binds pytest-bdd scenarios.
 """
 import ast
 import json
@@ -17,12 +17,12 @@ from gherkin.parser import Parser
 from steps.common import step_recorder
 from utils.settings import FILE_PATH
 
-# 记录测试文件与 feature 文件的映射关系
+# Tracks the mapping between test files and feature files
 path_file_decorator_json: dict = dict()
 
 
 def parse_feature_title_and_scenario(path, scenario_name):
-    """从 .feature 文件解析 Feature 标题和指定 Scenario 的名称及描述"""
+    """Parse the Feature title and specified Scenario name/description from a .feature file."""
     parser = Parser()
     with open(path, encoding="utf-8") as f:
         content = f.read()
@@ -56,9 +56,9 @@ def parse_feature_title_and_scenario(path, scenario_name):
 
 def bdd_case(program_top_directory_name, feature_path, scenario_name):
     """
-    BDD 测试用例装饰器。
-    自动解析 feature 文件，将 Feature 名映射为 Allure suite，
-    Scenario 描述/名称映射为 Allure title，并绑定 pytest-bdd scenario。
+    BDD test case decorator.
+    Parses the feature file, maps the Feature name to an Allure suite,
+    maps the Scenario description/name to an Allure title, and binds the pytest-bdd scenario.
     """
     PROJECT_ROOT_PATH = FILE_PATH["PROJECT_ROOT_PATH"]
     program_directory_path = os.path.join(PROJECT_ROOT_PATH, program_top_directory_name)
@@ -75,7 +75,7 @@ def bdd_case(program_top_directory_name, feature_path, scenario_name):
         feature_title, scenario_title, description = parse_feature_title_and_scenario(full_path, scenario_name)
         assert scenario_title, f"Scenario '{scenario_name}' not found in: {full_path}"
 
-        # 记录测试文件与 feature 的映射，写入 config/path_file_decorator.json
+        # Record test-file-to-feature mapping and write to config/path_file_decorator.json
         path_file_decorator: str = inspect.getfile(test_func)
         global path_file_decorator_json
         pfd_key = f"{path_file_decorator}::{test_func.__name__}"

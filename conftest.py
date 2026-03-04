@@ -1,6 +1,6 @@
 """
-Pytest 全局配置文件
-定义 fixtures（浏览器页面、失败截图）和 Allure 环境配置。
+Global pytest configuration.
+Defines fixtures (browser page, failure screenshots) and Allure environment setup.
 """
 import os
 import sys
@@ -16,7 +16,7 @@ from utils.settings import FILE_PATH
 
 PROJECT_ROOT_PATH = FILE_PATH["PROJECT_ROOT_PATH"]
 
-# 根据 ENV 环境变量加载对应的 .env 配置文件
+# Load the .env config file corresponding to the ENV environment variable
 env_test = os.getenv("ENV", "pre")
 env_path = os.path.join(PROJECT_ROOT_PATH, f".env.{env_test}.toml")
 
@@ -30,7 +30,7 @@ if not os.path.exists(FILE_PATH["allure"]):
 # ══════════════════ Pytest Hooks ══════════════════
 
 def pytest_sessionstart(session):
-    """测试会话开始时写入 Allure 环境信息文件"""
+    """Write Allure environment properties file at the start of the test session."""
     project = Path(PROJECT_ROOT_PATH).name
     envi = os.getenv("ENV", "pre")
 
@@ -46,7 +46,7 @@ def pytest_sessionstart(session):
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """捕获每个测试的执行结果，供 screenshot_on_failure fixture 使用"""
+    """Capture test outcome for each phase, used by the screenshot_on_failure fixture."""
     outcome = yield
     result = outcome.get_result()
     setattr(item, "rep_" + result.when, result)
@@ -61,9 +61,9 @@ def browser_context_args(browser_context_args):
 
 @pytest.fixture(scope="function", autouse=False)
 def page(browser, request):
-    """创建浏览器页面，带默认 20 秒超时，测试结束后自动关闭"""
+    """Create a browser page with a default 20s timeout; auto-closed after the test."""
     try:
-        logs.info(f"使用设备为 {os.getenv('device')}")
+        logs.info(f"Using device: {os.getenv('device')}")
         context = browser.new_context(permissions=["geolocation"])
         context.set_default_timeout(20000)
         page = context.new_page()
@@ -75,15 +75,15 @@ def page(browser, request):
 
 @pytest.fixture(scope="function", autouse=True)
 def screenshot_on_failure(request, page):
-    """测试失败时自动截图并附加到 Allure 报告"""
+    """Automatically capture a full-page screenshot on test failure and attach it to Allure."""
     yield
     if hasattr(request.node, "rep_call") and request.node.rep_call.failed:
         try:
             screenshot = page.screenshot(full_page=True)
             allure.attach(
                 screenshot,
-                name=f"失败截图 - {request.node.name}",
+                name=f"failure_screenshot - {request.node.name}",
                 attachment_type=allure.attachment_type.PNG,
             )
         except Exception as e:
-            logs.warning(f"截图失败: {e}")
+            logs.warning(f"Failed to capture screenshot: {e}")

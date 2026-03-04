@@ -2,6 +2,7 @@
 *.py[cod]
 __pycache__/
 **/__pycache__/
+*.pyc
 
 # Virtual environment
 .venv/
@@ -45,3 +46,6 @@ image/diff/
 # Temporary / debug files
 test_draft/
 ui_debugger.py
+
+# image
+*.png

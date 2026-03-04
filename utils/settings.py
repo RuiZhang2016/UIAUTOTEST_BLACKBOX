@@ -1,6 +1,6 @@
 """
-项目路径配置模块
-定义项目根目录和各关键目录的路径映射，供全局使用。
+Project path configuration module.
+Defines the project root directory and key directory path mappings for global use.
 """
 import os
 import sys

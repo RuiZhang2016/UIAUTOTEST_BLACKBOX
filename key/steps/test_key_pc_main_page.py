@@ -7,7 +7,7 @@ def test_pc_main_page():pass
 
 
 def _wait_for_page_stable(page, interval: float = 1, stable_threshold: float = 0.0001, timeout: float = 30.0):
-    """轮询截图，直到两帧之间的像素差低于阈值，说明页面渲染已稳定。"""
+    """Poll screenshots until the pixel diff between two consecutive frames drops below the threshold, indicating the page has stabilized."""
     from PIL import Image, ImageChops
     import io
 
@@ -39,4 +39,4 @@ def login_the_main_page(page):
 def check_main_elements_visible(page):
     screenshot = page.screenshot(type="png", full_page=True)
     diff_rate = compare_screenshot(baseline_name="key_pc_login_main.png", screenshot=screenshot, threshold=0.05)
-    assert diff_rate <= 0.05, f"页面视觉差异率 {diff_rate:.2%} 超过阈值 5%，请检查截图对比！"
+    assert diff_rate <= 0.05, f"Visual diff rate {diff_rate:.2%} exceeds the 5% threshold. Please check the screenshot comparison!"

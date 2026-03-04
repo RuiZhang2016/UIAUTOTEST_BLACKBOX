@@ -1,7 +1,7 @@
 """
-BDD 公共步骤定义模块
-提供截图对比等通用工具函数，以及 pytest-bdd 常用符号的统一导出，
-供各测试模块通过 wildcard import 使用。
+Shared BDD step definitions module.
+Provides common utilities such as screenshot comparison, and re-exports
+frequently used pytest-bdd symbols for wildcard import by test modules.
 """
 import io
 import os
@@ -18,8 +18,9 @@ from utils.settings import FILE_PATH
 
 def compare_screenshot(baseline_name: str, screenshot: bytes, threshold: float = 0.05) -> float:
     """
-    将当前截图与基线图片做像素级对比，返回差异率。
-    首次运行时自动保存基线；差异超过阈值时将对比图附加到 Allure 报告。
+    Perform a pixel-level comparison between the current screenshot and a baseline image.
+    Returns the diff rate. On the first run the baseline is saved automatically.
+    When the diff exceeds the threshold, comparison images are attached to the Allure report.
     """
     baseline_dir = os.path.join(FILE_PATH["image"], "baseline")
     diff_dir = os.path.join(FILE_PATH["image"], "diff")

@@ -1,7 +1,7 @@
 """
-日志工具模块
-配置控制台彩色输出和文件日志（支持并发安全的文件轮转），
-全局日志实例 logs 可直接导入使用。
+Logging utilities module.
+Configures colored console output and concurrent-safe rotating file logging.
+The global logger instance `logs` can be imported directly.
 """
 import logging
 import os
@@ -23,7 +23,7 @@ class HandleLogs:
 
     @classmethod
     def setting_log_color(cls):
-        """配置控制台日志颜色方案"""
+        """Configure the console log color scheme."""
         log_color_config = {
             'NOTSET': 'white',
             'FATAL': 'scarlet',
@@ -34,14 +34,14 @@ class HandleLogs:
             'CRITICAL': 'blue',
         }
         formatter = colorlog.ColoredFormatter(
-            '%(log_color)s%(levelname)s 【%(asctime)s-%(filename)s:%(lineno)d-%(module)s:%(funcName)s】:%(message)s',
+            '%(log_color)s%(levelname)s [%(asctime)s-%(filename)s:%(lineno)d-%(module)s:%(funcName)s]: %(message)s',
             log_colors=log_color_config,
         )
         return formatter
 
     @classmethod
     def output_logs(cls, log_level="debug"):
-        """创建 logger 实例，同时输出到控制台（带颜色）和日志文件（支持并发）"""
+        """Create a logger instance that outputs to both console (colored) and file (concurrent-safe)."""
         _nameToLevel = {
             'CRITICAL': logging.CRITICAL,
             'FATAL': logging.FATAL,
@@ -59,13 +59,12 @@ class HandleLogs:
 
         if not logger.handlers:
             log_format = logging.Formatter(
-                '%(levelname)s 【%(asctime)s%(filename)s:%(funcName)s:%(lineno)d】:%(message)s',
+                '%(levelname)s [%(asctime)s%(filename)s:%(funcName)s:%(lineno)d]: %(message)s',
             )
             sh = logging.StreamHandler()
             sh.setFormatter(color_formate)
             logger.addHandler(sh)
 
-            # ConcurrentRotatingFileHandler 解决多进程并发写文件的 permission 问题
             concurrent_handler = ConcurrentRotatingFileHandler(
                 filename=logfile_name, mode='a',
                 maxBytes=5242880, backupCount=7, encoding='utf-8',

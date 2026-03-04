@@ -1,7 +1,7 @@
 """
-通用工具模块
-提供 BDD 步骤记录（step_recorder）和步骤追踪（StepTracker）功能，
-被 utils/bdd_decorator.py 通过 steps/common.py 间接使用。
+Common utilities module.
+Provides BDD step recording (step_recorder) and step tracking (StepTracker),
+used by utils/bdd_decorator.py via steps/common.py.
 """
 import os
 from functools import wraps
@@ -14,8 +14,8 @@ from utils.settings import FILE_PATH
 
 def step_recorder(arg, whether_screen_shot_be_opened=False):
     """
-    装饰器：记录 BDD 步骤执行信息到 StepTracker，
-    同时在 Allure 报告中创建对应的 step 节点。
+    Decorator that records BDD step execution info into StepTracker
+    and creates a corresponding step node in the Allure report.
     """
     def wrapper1(step_function):
         @wraps(step_function)
@@ -35,7 +35,7 @@ def step_recorder(arg, whether_screen_shot_be_opened=False):
 
 
 class StepTracker:
-    """跟踪 BDD 步骤执行顺序，通过环境变量传递步骤状态"""
+    """Tracks BDD step execution order and propagates step state via environment variables."""
     steps_name_sequence = eval(str(os.getenv("steps_name_sequence")))
     current_step = os.getenv("current_step")
     current_step_args = os.getenv("current_step_args")
