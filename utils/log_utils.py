@@ -1,0 +1,79 @@
+"""
+日志工具模块
+配置控制台彩色输出和文件日志（支持并发安全的文件轮转），
+全局日志实例 logs 可直接导入使用。
+"""
+import logging
+import os
+import time
+
+import colorlog
+from concurrent_log_handler import ConcurrentRotatingFileHandler
+
+from utils.settings import FILE_PATH
+
+logs_path = FILE_PATH['log']
+if not os.path.exists(logs_path):
+    os.mkdir(logs_path)
+
+logfile_name = os.path.join(logs_path, 'test{}.log'.format(time.strftime('%Y%m%d-%H%M')))
+
+
+class HandleLogs:
+
+    @classmethod
+    def setting_log_color(cls):
+        """配置控制台日志颜色方案"""
+        log_color_config = {
+            'NOTSET': 'white',
+            'FATAL': 'scarlet',
+            'DEBUG': 'cyan',
+            'INFO': 'green',
+            'ERROR': 'red',
+            'WARNING': 'yellow',
+            'CRITICAL': 'blue',
+        }
+        formatter = colorlog.ColoredFormatter(
+            '%(log_color)s%(levelname)s 【%(asctime)s-%(filename)s:%(lineno)d-%(module)s:%(funcName)s】:%(message)s',
+            log_colors=log_color_config,
+        )
+        return formatter
+
+    @classmethod
+    def output_logs(cls, log_level="debug"):
+        """创建 logger 实例，同时输出到控制台（带颜色）和日志文件（支持并发）"""
+        _nameToLevel = {
+            'CRITICAL': logging.CRITICAL,
+            'FATAL': logging.FATAL,
+            'ERROR': logging.ERROR,
+            'WARN': logging.WARNING,
+            'WARNING': logging.WARNING,
+            'INFO': logging.INFO,
+            'DEBUG': logging.DEBUG,
+            'NOTSET': logging.NOTSET,
+        }
+        log_level = _nameToLevel.get(log_level.upper())
+        logger = logging.getLogger(__name__)
+        color_formate = cls.setting_log_color()
+        logger.setLevel(log_level)
+
+        if not logger.handlers:
+            log_format = logging.Formatter(
+                '%(levelname)s 【%(asctime)s%(filename)s:%(funcName)s:%(lineno)d】:%(message)s',
+            )
+            sh = logging.StreamHandler()
+            sh.setFormatter(color_formate)
+            logger.addHandler(sh)
+
+            # ConcurrentRotatingFileHandler 解决多进程并发写文件的 permission 问题
+            concurrent_handler = ConcurrentRotatingFileHandler(
+                filename=logfile_name, mode='a',
+                maxBytes=5242880, backupCount=7, encoding='utf-8',
+            )
+            concurrent_handler.setFormatter(log_format)
+            logger.addHandler(concurrent_handler)
+
+        return logger
+
+
+logs = HandleLogs.output_logs()

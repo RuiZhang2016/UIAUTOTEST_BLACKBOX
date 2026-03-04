@@ -1,0 +1,47 @@
+# Python
+*.py[cod]
+__pycache__/
+**/__pycache__/
+
+# Virtual environment
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+log/
+
+# Test outputs
+*.output
+output.txt
+.cache/
+.pytest_cache/
+allure_results/
+allure_report/
+reports/
+build/
+bugs/
+
+# Config generated at runtime
+config/pytest_summary.yaml
+config/pytest_summary.yaml.lock
+config/path_file_decorator.json
+utils/path_file_decorator.json
+state.json
+
+# Environment config (contains secrets)
+.env.*.toml
+
+# Image diffs (baseline images are tracked)
+image/diff/
+
+# Node
+**/node_modules/
+
+# Temporary / debug files
+test_draft/
+ui_debugger.py
